@@ -2,9 +2,16 @@
     h3{
         display:inline;
     }
+    a{
+        float:right;
+    }
+    
 </style>
 <% for(i=0; i<allbooks.length;i++){%>
     <h3><%=allbooks[i].id%></h3>
     <h3><%=allbooks[i].name%></h3>-
     <h3><%=allbooks[i].author%></h3></br>
+    <form action="/<%= allbooks[i]._id %>?_method=DELETE" method="POST">
+        <button>Delete</button>
+    </form>
 <%}%>

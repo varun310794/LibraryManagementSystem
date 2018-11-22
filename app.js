@@ -27,7 +27,7 @@ app.get("/", function(req, res){
     res.render("homepage.ejs");
 });
 //new books------------------------------------------
-app.get("/newbooks", function(req, res){
+app.get("/books/new", function(req, res){
     res.render("newbooks.ejs");
 });
 
@@ -55,15 +55,16 @@ app.post("/books", function(req, res){
     });
 });
 
-//new customers---------------------------------------- 
-app.get("/customers", function(req, res){
-    res.render("customers.ejs");
+app.delete("/:id", function(req, res){
+   //res.send("hi");
+   book.findByIdAndRemove(req.params.id, function(err, removedbook){
+       if(err){
+           console.log(err);
+       }else{
+           res.redirect("/books");
+       }
+   }); 
 });
-//new employees---------------------------------------
-app.get("/employees", function(req, res){
-    res.render("employees.ejs");
-});
-
 
 
 app.listen(process.env.PORT, process.env.IP, function(){
