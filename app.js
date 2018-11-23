@@ -11,7 +11,7 @@ app.use(methodOverride("_method"));
 
 mongoose.connect("mongodb://localhost/lms",{useNewUrlParser: true});
 
-//schema------------------------------------------
+//BookSchema------------------------------------------
 
 var bookSchema=new mongoose.Schema({
     name:String,
@@ -21,12 +21,20 @@ var bookSchema=new mongoose.Schema({
 
 var book=mongoose.model("book",bookSchema);
 
+//-------------------------------------------------
+
+var customerSchema=new mongoose.Schema({
+    name:String,
+    id:Number
+});
+
+var customer=mongoose.model("customer", customerSchema);
 
 // homepage----------------------------------------
 app.get("/", function(req, res){
     res.render("homepage.ejs");
 });
-//new books------------------------------------------
+//books
 app.get("/books/new", function(req, res){
     res.render("newbooks.ejs");
 });
@@ -65,6 +73,50 @@ app.delete("/:id", function(req, res){
        }
    }); 
 });
+
+app.get("/checkout1", function(req, res){
+    res.render("checkout1.ejs");
+});
+
+app.get("/customers/new", function(req, res){
+    res.render("newcustomers.ejs");
+});
+
+app.get("/customers", function(req, res){
+    customer.find({}, function(err, allcustomers){
+        if(err){
+            console.log(err);
+        }else{
+            res.render("customers.ejs",{allcustomers:allcustomers});
+        }
+    });
+});
+
+app.post("/customers", function(req, res){
+    var name=req.body.name;
+    var id=req.body.id;
+    var newcustomer={name:name, id: id};
+    customer.create(newcustomer,function(err, thecustomer){
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/customers");
+        }
+    });
+});
+
+app.delete("/customers/:id", function(req, res){
+   //res.send("hi");
+   customer.findByIdAndRemove(req.params.id, function(err, removedcustomer){
+       if(err){
+           console.log(err);
+       }else{
+           res.redirect("/customers");
+       }
+   }); 
+});
+
+
 
 
 app.listen(process.env.PORT, process.env.IP, function(){

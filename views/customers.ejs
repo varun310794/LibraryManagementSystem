@@ -1,21 +1,18 @@
 <% include partials/header %>
-<div class="container">
-    <div class="row">
-        <h1 style="text-align: center">Enter a New Customer</h1>
-        <div style="width: 30%; margin: 25px auto;">
-            <form action="#" method="#">
-                <div class="form-group">
-                    <input class="form-control" type="text" name="name" placeholder="Enter Customer name">
-                </div>
-                <div class="form-group">
-                    <input class="form-control" type="text" name="id" placeholder="Enter Customer Id">
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Submit!</button>
-                </div>
-            </form>
-            <a href="/">Go Back</a>
-        </div>
-    </div>
-</div>
+<style>
+    h3{
+        display:inline;
+    }
+    a{
+        float:right;
+    }
+    
+</style>
+<% for(i=0; i<allcustomers.length;i++){%>
+    <h3><%=allcustomers[i].id%></h3>-
+    <h3><%=allcustomers[i].name%></h3></br>
+    <form action="/customers/<%= allcustomers[i]._id %>?_method=DELETE" method="POST">
+        <button>Delete</button>
+    </form></br></br>
+<%}%>
 <% include partials/footer %>
