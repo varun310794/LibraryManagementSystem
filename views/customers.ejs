@@ -3,14 +3,13 @@
     h3{
         display:inline;
     }
-    a{
-        float:right;
-    }
+   
     
 </style>
 <% for(i=0; i<allcustomers.length;i++){%>
     <h3><%=allcustomers[i].id%></h3>-
     <h3><%=allcustomers[i].name%></h3></br>
+    <a href="/customers/<%=allcustomers[i]._id%>">Show</a></br></br>
     <form action="/customers/<%= allcustomers[i]._id %>?_method=DELETE" method="POST">
         <button>Delete</button>
     </form></br></br>

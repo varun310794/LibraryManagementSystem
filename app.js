@@ -16,21 +16,42 @@ mongoose.connect("mongodb://localhost/lms",{useNewUrlParser: true});
 var bookSchema=new mongoose.Schema({
     name:String,
     author:String,
-    id:Number
+    id:Number,
+    customers:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "customer"
+                }
+        ]
 });
 
 var book=mongoose.model("book",bookSchema);
 
 //-------------------------------------------------
 
+
 var customerSchema=new mongoose.Schema({
     name:String,
-    id:Number
+    id:Number,
+    books:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "book"
+        }
+    ]
 });
 
 var customer=mongoose.model("customer", customerSchema);
 
+book.create({
+    name:"hp",
+    author:"jk",
+    id:1
+});
+
+
 // homepage----------------------------------------
+
 app.get("/", function(req, res){
     res.render("homepage.ejs");
 });
@@ -73,10 +94,8 @@ app.delete("/:id", function(req, res){
        }
    }); 
 });
-
-app.get("/checkout1", function(req, res){
-    res.render("checkout1.ejs");
-});
+//------------------------------------------------------------
+//------------------------------------------------------------
 
 app.get("/customers/new", function(req, res){
     res.render("newcustomers.ejs");
@@ -114,6 +133,19 @@ app.delete("/customers/:id", function(req, res){
            res.redirect("/customers");
        }
    }); 
+});
+
+//----------------------------------------------------
+
+app.get("/customers/:id", function(req, res){
+    customer.findById(req.params.id, function(err, fcustomer){
+        if(err){
+            console.log(err);
+        }
+        else{
+            res.render("show.ejs", {fcustomer:fcustomer});
+        }
+    });    
 });
 
 
