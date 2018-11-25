@@ -43,12 +43,30 @@ var customerSchema=new mongoose.Schema({
 
 var customer=mongoose.model("customer", customerSchema);
 
-book.create({
-    name:"hp",
-    author:"jk",
-    id:1
-});
-
+/*book.create({
+    name:"SPP",
+    author:"SKK",
+    id:26
+}, function(err, newbook){
+    if(err){
+        console.log(err);
+    }else{
+        customer.findOne({name:"Varun Peddaiahgari"}, function(err, foundcustomer){
+            if(err){
+                console.log(err);
+            }else{
+                foundcustomer.books.push(newbook);
+                foundcustomer.save(function(err, data){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        console.log(data);
+                    }
+                });
+            }
+        })
+    }
+});*/
 
 // homepage----------------------------------------
 
@@ -138,7 +156,7 @@ app.delete("/customers/:id", function(req, res){
 //----------------------------------------------------
 
 app.get("/customers/:id", function(req, res){
-    customer.findById(req.params.id, function(err, fcustomer){
+    customer.findById(req.params.id).populate("books").exec(function(err, fcustomer){
         if(err){
             console.log(err);
         }
