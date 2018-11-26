@@ -1,17 +1,26 @@
 <% include partials/header %>
 <style>
-    h3{
-        display:inline;
+    
+    .posab{
+        display:inline-block;
     }
-   
+    .moveleft{
+        padding-left:20px;
+    }
     
 </style>
+
 <% for(i=0; i<allcustomers.length;i++){%>
-    <h3><%=allcustomers[i].id%></h3>-
-    <h3><%=allcustomers[i].name%></h3></br>
-    <a href="/customers/<%=allcustomers[i]._id%>">Show</a></br></br>
-    <form action="/customers/<%= allcustomers[i]._id %>?_method=DELETE" method="POST">
-        <button>Delete</button>
-    </form></br></br>
+    <div class="moveleft">
+    <h3><%=allcustomers[i].id%>-<%=allcustomers[i].name%></h3>
+    <div class="posab">
+        <a href="/customers/<%=allcustomers[i]._id%>" class="btn btn-primary btn-sm">Show</a>
+    </div>
+    <div class="posab">
+        <form action="/customers/<%= allcustomers[i]._id %>?_method=DELETE" method="POST">
+        <button class="btn btn-primary btn-sm">Delete</button>
+        </form>
+    </div></br></br></br>
+</div>
 <%}%>
 <% include partials/footer %>

@@ -6,14 +6,17 @@
     a{
         float:right;
     }
+    .moveleft{
+        padding-left:20px;
+    }
     
 </style>
 <% for(i=0; i<allbooks.length;i++){%>
-    <h3><%=allbooks[i].id%></h3>-
-    <h3><%=allbooks[i].name%></h3>-
-    <h3><%=allbooks[i].author%></h3></br>
+<div class="moveleft">
+    <h3><%=allbooks[i].id%>-<%=allbooks[i].name%>-<%=allbooks[i].author%></h3></br>
     <form action="/<%= allbooks[i]._id %>?_method=DELETE" method="POST">
-        <button>Delete</button>
+        <button class="btn btn-primary btn-sm">Delete</button>
     </form></br></br>
+</div>
 <%}%>
 <% include partials/footer %>
