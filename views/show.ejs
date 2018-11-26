@@ -1,19 +1,28 @@
 <% include partials/header %>
 
-<h3>Customer Name:<%=fcustomer.name  %></h3>
-<h3>Customer Id:<%=fcustomer.id  %></h3></br></br></br>
-<h2>Book's Taken:</h2>
-
-<%if(fcustomer.books.length===0){%>
-<p>No books taken at the moment</p>
-<%}%>
-
-
-<%for(i=0; i<fcustomer.books.length; i++){ %>
-<p><%=i+1 %>-<%= fcustomer.books[i].name %></p>
-<a></a>
-<%}%>
-
+<style>
+    .moveleft{
+        padding-left:20px;
+    }
+</style>
+<div class="moveleft">
+    <h3>Customer Name:<%=fcustomer.name  %></h3>
+    <h3>Customer Id:<%=fcustomer.id  %></h3></br></br></br>
+    <h2>Book's Taken:</h2>
+    
+    <%if(fcustomer.books.length===0){%>
+        <p>No books taken at the moment</p>
+    <%}%>
+    
+    
+    <%for(i=0; i<fcustomer.books.length; i++){ %>
+        <h5 class="pospa"><%=i+1 %>-<%= fcustomer.books[i].name %></h5>
+        <form action="/customers/<%=fcustomer._id%>/<%= fcustomer.books[i]._id %>/checkin" method="post">
+        <button class="btn btn-primary btn-sm">CheckIn</button>
+        </form>
+        
+    <%}%>
+</div>
 <div class="container">
     <div class="row">
         <h1 style="text-align: center">Checkout a Book</h1>

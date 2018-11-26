@@ -177,7 +177,33 @@ app.post("/customers/:id/checkout", function(req, res){
         }
     });    
 });
-
+//---------------------------------------------------------
+app.post("/customers/:cid/:bid/checkin", function(req, res){
+    
+customer.findById(req.params.cid, function(err, foundcustomer){
+        if(err){
+            console.log(err);
+        }else{
+            book.findById(req.params.bid, function(err, foundbook){
+                
+                if(err){
+                    console.log(err);
+                }else{
+                    foundcustomer.books.pull(foundbook);
+                    foundcustomer.save(function(err, data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.redirect("/customers/" + req.params.cid);
+                        }
+                    });
+                }
+            });
+        }
+    });
+    
+});
+    
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("The server has started");
 });
