@@ -11,17 +11,29 @@
 
 <%for(i=0; i<fcustomer.books.length; i++){ %>
 <p><%=i+1 %>-<%= fcustomer.books[i].name %></p>
+<a></a>
 <%}%>
 
-
-<a class="btn btn-primary" href="#">Checkout a Book</a>
+<div class="container">
+    <div class="row">
+        <h1 style="text-align: center">Checkout a Book</h1>
+        <h4 style="text-align:center">You are allowed to checkout only two books at a time.</h4>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/customers/<%= fcustomer._id %>/checkout" method="Post">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="id1" placeholder="Enter book id">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="id2" placeholder="Enter book Id">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block">Checkout</button>
+                </div>
+            </form>
+            <a href="/">Go Back</a>
+        </div>
+    </div>
+</div>
 
 <% include partials/footer %>
 
-<!--if(condition){
-    statement 1
-}else{
-    for(condition 2){
-        statement 2    
-    }
-}

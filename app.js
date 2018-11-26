@@ -29,7 +29,6 @@ var book=mongoose.model("book",bookSchema);
 
 //-------------------------------------------------
 
-
 var customerSchema=new mongoose.Schema({
     name:String,
     id:Number,
@@ -40,34 +39,7 @@ var customerSchema=new mongoose.Schema({
         }
     ]
 });
-
 var customer=mongoose.model("customer", customerSchema);
-
-/*book.create({
-    name:"SPP",
-    author:"SKK",
-    id:26
-}, function(err, newbook){
-    if(err){
-        console.log(err);
-    }else{
-        customer.findOne({name:"Varun Peddaiahgari"}, function(err, foundcustomer){
-            if(err){
-                console.log(err);
-            }else{
-                foundcustomer.books.push(newbook);
-                foundcustomer.save(function(err, data){
-                    if(err){
-                        console.log(err);
-                    }else{
-                        console.log(data);
-                    }
-                });
-            }
-        })
-    }
-});*/
-
 // homepage----------------------------------------
 
 app.get("/", function(req, res){
@@ -112,7 +84,6 @@ app.delete("/:id", function(req, res){
        }
    }); 
 });
-//------------------------------------------------------------
 //------------------------------------------------------------
 
 app.get("/customers/new", function(req, res){
@@ -161,13 +132,51 @@ app.get("/customers/:id", function(req, res){
             console.log(err);
         }
         else{
+            
             res.render("show.ejs", {fcustomer:fcustomer});
         }
     });    
 });
 
-
-
+//--------------------------------------------------------
+app.post("/customers/:id/checkout", function(req, res){
+    customer.findById(req.params.id, function(err, foundcustomer){
+        if(err){
+            console.log(err);
+        }else{
+            var fid=req.body.id1;
+            book.findOne({id:fid}, function(err, foundbook){
+                if(err){
+                    console.log(err);
+                }else{
+                    foundcustomer.books.push(foundbook);
+                    foundcustomer.save(function(err, data){
+                        if(err){
+                            console.log(err)
+                        }else{
+                            var sid=req.body.id2;
+                            book.findOne({id:sid}, function(err, foundBook){
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    foundcustomer.books.push(foundBook);
+                                    foundcustomer.save(function(err, data){
+                                        if(err){
+                                            console.log(err);
+                                        }else{
+                                            res.redirect("/customers/" + req.params.id);                                            
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+        }
+    });    
+});
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("The server has started");
