@@ -17,7 +17,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			    </button>
-				<a href="#" class="navbar-brand">Library Management System</a>
+				<a href="/" class="navbar-brand"><b>LMS</b></a>
 			</div>
 			<div class="collapse navbar-collapse" id="abcd">
 			<ul class="nav navbar-nav">
@@ -28,8 +28,13 @@
 			</ul>
 			
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="#">Log In</a></li>
-				<li><a href="#">Sign Up</a></li>
+				<%if(!currentUser){%>
+				<li><a href="/register">SignUp</a></li>
+				<li><a href="/login">LogIn</a></li>
+				<%}else{%>
+				<li><a href="#">Signed In As <b><%= currentUser.username %></b></a></li>
+				<li><a href="/logout">LogOut</a></li>
+				<%}%>
 			</ul>
 			
 			</div>
