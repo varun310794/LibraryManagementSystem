@@ -1,5 +1,5 @@
 .navbar{
-    background:rgb(0, 51, 102);
+    background:rgb(255, 102, 255);
     color:green;
 }
 
@@ -11,8 +11,8 @@
 .navbar .nav li a{
     
     color:white;
-    font-size:18px; 
-    background:black;
+    font-size:18px;
+   
     
 }
 

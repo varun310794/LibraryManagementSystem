@@ -138,13 +138,15 @@ app.get("/customers/:id", function(req, res){
     });    
 });
 
+   
+
 //--------------------------------------------------------
 app.post("/customers/:id/checkout", function(req, res){
     customer.findById(req.params.id, function(err, foundcustomer){
         if(err){
             console.log(err);
         }else{
-            var fid=req.body.id1;
+            var fid=req.body.id;
             book.findOne({id:fid}, function(err, foundbook){
                 if(err){
                     console.log(err);
@@ -152,23 +154,9 @@ app.post("/customers/:id/checkout", function(req, res){
                     foundcustomer.books.push(foundbook);
                     foundcustomer.save(function(err, data){
                         if(err){
-                            console.log(err)
+                            console.log(err);
                         }else{
-                            var sid=req.body.id2;
-                            book.findOne({id:sid}, function(err, foundBook){
-                                if(err){
-                                    console.log(err);
-                                }else{
-                                    foundcustomer.books.push(foundBook);
-                                    foundcustomer.save(function(err, data){
-                                        if(err){
-                                            console.log(err);
-                                        }else{
-                                            res.redirect("/customers/" + req.params.id);                                            
-                                        }
-                                    });
-                                }
-                            });
+                            res.redirect("/customers/" + req.params.id);  
                         }
                     });
                 }
@@ -177,8 +165,9 @@ app.post("/customers/:id/checkout", function(req, res){
         }
     });    
 });
+
 //---------------------------------------------------------
-app.post("/customers/:cid/:bid/checkin", function(req, res){
+ app.post("/customers/:cid/:bid/checkin", function(req, res){
     
 customer.findById(req.params.cid, function(err, foundcustomer){
         if(err){
@@ -203,7 +192,9 @@ customer.findById(req.params.cid, function(err, foundcustomer){
     });
     
 });
-    
+
+ 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("The server has started");
 });
+

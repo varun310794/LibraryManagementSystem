@@ -13,13 +13,30 @@
 </style>
 <% for(i=0; i<allbooks.length;i++){%>
 <div class="moveleft">
-    <h3><%=allbooks[i].id%>-<%=allbooks[i].name%>-<%=allbooks[i].author%></h3></br>
+    <h3><%=allbooks[i].id%>--<%=allbooks[i].name%>---<%=allbooks[i].author%></h3></br>
     <form action="/<%= allbooks[i]._id %>?_method=DELETE" method="POST">
         <button class="btn btn-primary btn-sm">Delete</button>
     </form></br></br>
 </div>
 <%}%>
 <% include partials/footer %>
+
+
+<!--var sid=req.body.id2;
+                            book.findOne({id:sid}, function(err, foundBook){
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    foundcustomer.books.push(foundBook);
+                                    foundcustomer.save(function(err, data){
+                                        if(err){
+                                            console.log(err);
+                                        }else{
+                                            res.redirect("/customers/" + req.params.id);                                            
+                                        }
+                                    });
+                                }
+                            });
 
 
 
