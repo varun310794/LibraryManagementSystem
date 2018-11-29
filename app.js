@@ -221,6 +221,17 @@ customer.findById(req.params.cid, function(err, foundcustomer){
     });
     
 });
+
+app.get("/employees", isLoggedIn, function(req, res){
+    user.find({}, function(err, data){
+        if(err){
+            console.log(err);
+        }else{
+            res.render("employees.ejs", {data:data});
+        }
+    });
+});
+
 // Authentication-------------------------------------------------------
 //show sign up form
  

@@ -4,16 +4,26 @@
 }
 
 .navbar .navbar-header .navbar-brand{
-    
     color:white;
 }
 
 .navbar .nav li a{
-    
     color:white;
     font-size:18px;
-   
+}
+
+.fitpro{
+    padding:2%;
+   border:0.5px solid rgb(255, 204, 204);
+   margin:0 auto;
     
 }
 
+span{
+    padding-left:145px;
+}
+
+span a:hover{
+    color:green;
+}
 
