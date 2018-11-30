@@ -1,6 +1,14 @@
 <% include partials/header %>
+<style>
+    h5{
+        padding:0;
+        margin:0;
+        
+    }
+</style>
 
 <% for(i=0; i<data.length; i++){ %>
-    <h3><%= i+1 %>-<%= data[i].username %></h3>
+    <h3><%= i+1 %>-<%= data[i].firstname %> <%= data[i].lastname %></h3>
+    <h5><%= data[i].username %></h5>
 <%}%>
 <% include partials/footer %>

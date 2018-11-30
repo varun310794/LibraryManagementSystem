@@ -6,9 +6,13 @@ var passport=require("passport");
 var localStrategy=require("passport-local");
 var passportLocalMongoose=require("passport-local-mongoose");
 var methodOverride = require("method-override");
+var expressValidator=require("express-validator");
+var expressSession=require("express-session");
+
 app.set("view engine", "ejs");
 app.use(express.static(__dirname+"/public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressValidator());
 app.use(methodOverride("_method"));
 
 mongoose.connect("mongodb://localhost/lms",{useNewUrlParser: true});
@@ -46,6 +50,8 @@ var customer=mongoose.model("customer", customerSchema);
 
 var userSchema=new mongoose.Schema({
     username:String,
+    firstname:String,
+    lastname:String,
     password:String
 });
 userSchema.plugin(passportLocalMongoose);
@@ -72,8 +78,13 @@ app.use(function(req, res, next){
 // homepage----------------------------------------
 
 app.get("/", function(req, res){
+    res.render("login.ejs");
+});
+
+app.get("/homepage",isLoggedIn, function(req, res){
     res.render("homepage.ejs");
 });
+
 //books
 app.get("/books/new",isLoggedIn, function(req, res){
     res.render("newbooks.ejs");
@@ -241,7 +252,14 @@ app.get("/employees", isLoggedIn, function(req, res){
 //Sign UP logic
 
 app.post("/register", function(req, res){
-    var newUser = new user({username: req.body.username});
+    var newUser = new user(
+        {
+        firstname: req.body.firstname,
+        lastname:  req.body.lastname,
+        username:  req.body.username
+        }
+    );
+    
     user.register(newUser, req.body.password, function(err, user){
         if(err){
             console.log(err);
@@ -259,12 +277,12 @@ app.get("/login", function(req, res){
 // login logic
 app.post("/login", passport.authenticate("local", 
     {
-        successRedirect: "/",
+        successRedirect: "/homepage",
         failureRedirect: "/login"
     }), function(req, res){
 }); 
 
-// logic route
+// logout route
 app.get("/logout", function(req, res){
    req.logout();
    res.redirect("/login");
