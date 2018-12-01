@@ -51,8 +51,18 @@
        
 </head>
 <body>
+    
+    
 
 <div class="fitpro" style="width: 25%;">
+                    
+                        <% for(i=0;i<message.length;i++){%>
+                            <p style="color:grey; padding:0; margin:0;"><%= message[i].msg %></p>
+                        <% } %>
+                        
+                       <p><%= mes %></p>
+                     
+                    
     
                     <h2 style="margin-top:0;">Create Account</h2>
                     <form action="/register" method="POST">
@@ -76,7 +86,7 @@
                         <p><span class="glyphicon glyphicon-pencil"></span>passwords must be at least 6 charecters!!</p>
                         <div class="form-group">
                             <label>Re Enter Password</label>
-                            <input class="form-control" type="password" style="height:30px;">
+                            <input class="form-control" type="password" name="confirmpassword" style="height:30px;">
                         </div>
                         </br>
                         <div class="form-group">

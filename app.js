@@ -7,13 +7,17 @@ var localStrategy=require("passport-local");
 var passportLocalMongoose=require("passport-local-mongoose");
 var methodOverride = require("method-override");
 var expressValidator=require("express-validator");
-var expressSession=require("express-session");
+var flash=require("connect-flash");
+var async=require("async");
+var nodeMailer=require("nodemailer");
+var crypto=require("crypto");
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname+"/public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressValidator());
 app.use(methodOverride("_method"));
+app.use(flash());
 
 mongoose.connect("mongodb://localhost/lms",{useNewUrlParser: true});
 
@@ -245,35 +249,54 @@ app.get("/employees", isLoggedIn, function(req, res){
 
 // Authentication-------------------------------------------------------
 //show sign up form
- 
- app.get("/register", function(req, res){
-     res.render("register.ejs");
- });
-//Sign UP logic
-
-app.post("/register", function(req, res){
-    var newUser = new user(
-        {
-        firstname: req.body.firstname,
-        lastname:  req.body.lastname,
-        username:  req.body.username
-        }
-    );
+ app.get("/register", function(req, res, next){
+    res.render("register.ejs", {message:req.flash("errors"),mes:req.flash("error")});
     
-    user.register(newUser, req.body.password, function(err, user){
-        if(err){
-            console.log(err);
-            return res.render("register.ejs");
+ });
+
+//Sign UP logic
+app.post("/register", function(req, res){
+    req.check('firstname', 'Please enter your First Name').isLength({min: 1});
+    req.check('lastname', 'Please enter your Last Name').isLength({min: 1});
+    req.check('password', 'Passwords must be greater than 6 charecters').isLength({min: 6});
+    req.check('confirmpassword', 'passwords do not match').equals(req.body.password);
+   
+    var errors = req.validationErrors();
+      
+      if (errors) {
+        console.log(errors);
+        req.flash("errors", errors);
+        res.redirect("/register");
+        
+      } else {
+        var newUser = new user(
+        {
+            firstname: req.body.firstname,
+            lastname:  req.body.lastname,
+            username:  req.body.username
         }
-        passport.authenticate("local")(req, res, function(){
-           res.redirect("/"); 
+        );
+    
+            user.register(newUser, req.body.password, function(err, user){
+            if(err){
+                console.log(err);
+               req.flash("error", "Sorry! User with this email already exists.");
+                return res.render("register.ejs",{message:req.flash("errors"), mes:req.flash("error")});
+            }
+            passport.authenticate("local")(req, res, function(){
+            res.redirect("/"); 
         });
-    });
+        });
+      }
+   
+    
 });
+
 // show login form
 app.get("/login", function(req, res){
    res.render("login.ejs"); 
 });
+
 // login logic
 app.post("/login", passport.authenticate("local", 
     {
