@@ -84,7 +84,7 @@ app.use(function(req, res, next){
 // homepage----------------------------------------
 
 app.get("/", function(req, res){
-    res.render("login.ejs");
+    res.render("login.ejs", {message:req.flash("err")});
 });
 
 app.get("/homepage",isLoggedIn, function(req, res){
@@ -296,19 +296,30 @@ app.post("/register", function(req, res){
 
 // show login form
 app.get("/login", function(req, res){
-   res.render("login.ejs"); 
+   res.render("login.ejs",{message:req.flash("error")}); 
 });
 
 // login logic
-app.post("/login", passport.authenticate("local", 
-    {
-        successRedirect: "/homepage",
-        failureRedirect: "/login"
-    }), function(req, res, err){
-        if(err){
-            console.log(err);
-        }
-}); 
+//app.post("/login", passport.authenticate("local", {successRedirect: "/homepage",failureRedirect: "/login"}), function(req, res){}); 
+
+app.post('/login', function (req, res, next) {
+  passport.authenticate('local', function (err, user, info) {
+    if (err) {
+      return console.log(err);
+    }
+    if (!user) {
+      console.log(info);// this will print the IncorrectUsernameError: Password or username is incorrect
+      req.flash('error', info.message );
+      return res.redirect('/login');
+    }
+    req.logIn(user, function (err) {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect('/homepage');
+    });
+  })(req, res, next);
+});
 
 // logout route
 app.get("/logout", function(req, res){
@@ -427,7 +438,7 @@ app.post('/reset/:token', function(req, res) {
                     done(err, user);
               });
             });
-          })
+          });
         } else {
             req.flash("error2", "Passwords do not match.");
             return res.redirect('back');

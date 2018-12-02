@@ -1,7 +1,7 @@
 
 
-<% include partials/header %>
-	
+<html>
+	</head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <style>
@@ -60,14 +60,14 @@ span a:hover{
 <body>
 
 <div class="fitpro" style="width: 25%;">
-					<h5 style="color:red;"><%= forgotError %></h3>
-    				<h5 style="color:blue;"><%= forgotSuccess %></h3>
+					<h5 style="color:red;"><%= forgotError %></h5>
+    				<h5 style="color:blue;"><%= forgotSuccess %></h5>
                     	<h2>Forgot Password</h2>
                     <form action="/forgot" method="POST">
                     
                         <div class="form-group">
                         	<label for="email">Email</label>
-                            <input class="form-control" type="email" name="username" placeholder="New password"  style="height:30px;">
+                            <input class="form-control" type="email" name="username" placeholder="Enter Email id"  style="height:30px;">
                         </div>
                         </br>
                         <div class="form-group">
