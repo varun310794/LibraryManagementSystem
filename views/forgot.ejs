@@ -1,5 +1,7 @@
-<html>
-    <head>
+
+
+<% include partials/header %>
+	
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
 <style>
@@ -58,26 +60,21 @@ span a:hover{
 <body>
 
 <div class="fitpro" style="width: 25%;">
-    
-                    <h2 style="margin-top:0;">Sign In</h2>
-                    <form action="/login" method="POST">
-                        <label>Email</label>
-                        <div class="form-group">
-                            <input class="form-control" type="email" name="username"  style="height:30px;">
-                        </div>
-                        <label>Password<span style="color:rgb(179, 102, 255);"><a href="/forgot">Forgot Password</a></span></label>
-                        <div class="form-group">
-                            <input class="form-control" type="password" name="password"  style="height:30px;">
-                        </div></br>
-                        <div class="form-group">
-                            <input class=" btn btn-block" style="height:30px; padding:0; color:rgb(26, 26, 26); font-size:12px; border:1px solid rgb(105, 105, 105);" type="submit" value="Sign in">
-                        </div>
-                    </form></br>
-                    <p><span>Sign up here!</span></p>
+					<h5 style="color:red;"><%= forgotError %></h3>
+    				<h5 style="color:blue;"><%= forgotSuccess %></h3>
+                    	<h2>Forgot Password</h2>
+                    <form action="/forgot" method="POST">
                     
-                            <a class="btn btn-block signup" style="height:26px; padding-bottom:25px;  color:rgb(26, 26, 26); font-size:12px; border:1px solid rgb(105, 105, 105);" href="/register">Create Your Account</a>
+                        <div class="form-group">
+                        	<label for="email">Email</label>
+                            <input class="form-control" type="email" name="username" placeholder="New password"  style="height:30px;">
+                        </div>
+                        </br>
+                        <div class="form-group">
+                            <input class=" btn btn-block" style="height:30px; padding:0; color:rgb(26, 26, 26); font-size:12px; border:1px solid rgb(105, 105, 105);" type="submit" value="Reset Password">
+                        </div>
+                    </form>
                     
 </div>              
-
 
 <% include partials/footer %> 

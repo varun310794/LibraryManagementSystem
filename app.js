@@ -56,7 +56,9 @@ var userSchema=new mongoose.Schema({
     username:String,
     firstname:String,
     lastname:String,
-    password:String
+    password:String,
+    resetPasswordToken:String,
+    resetPasswordExpires:Date
 });
 userSchema.plugin(passportLocalMongoose);
 var user=mongoose.model("user", userSchema);
@@ -86,7 +88,7 @@ app.get("/", function(req, res){
 });
 
 app.get("/homepage",isLoggedIn, function(req, res){
-    res.render("homepage.ejs");
+    res.render("homepage.ejs",{message:req.flash('success')});
 });
 
 //books
@@ -302,7 +304,10 @@ app.post("/login", passport.authenticate("local",
     {
         successRedirect: "/homepage",
         failureRedirect: "/login"
-    }), function(req, res){
+    }), function(req, res, err){
+        if(err){
+            console.log(err);
+        }
 }); 
 
 // logout route
@@ -317,6 +322,148 @@ function isLoggedIn(req, res, next){
     }
     res.redirect("/login");
 }
+
+//forgotPassword
+app.get("/forgot", function(req, res){
+    res.render("forgot.ejs", {forgotError:req.flash("error"), forgotSuccess:req.flash("success") });
+});
+
+app.post('/forgot', function(req, res, next) {
+  async.waterfall([
+    function(done) {
+      crypto.randomBytes(20, function(err, buf) {
+        var token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    function(token, done) {
+      user.findOne({ username: req.body.username }, function(err, user) {
+        if(err){
+            console.log(err);
+        }else{  
+        if (!user) {
+          req.flash('error', 'No account with that email address exists.');
+          return res.redirect('/forgot');
+        }}
+
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+        user.save(function(err) {
+          done(err, token, user);
+        });
+      });
+    },
+    function(token, user, done) {
+      var smtpTransport = nodeMailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'librarymanagementsystem745@gmail.com',
+          pass: 'librarymanagementsystem'
+        }
+      });
+      var mailOptions = {
+        to: user.username,
+        from: 'librarymanagementsystem745@gmail.com',
+        subject: 'LMS Password Reset',
+        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+          'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+          'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+        console.log('mail sent');
+        req.flash('success', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
+        done(err, 'done');
+      });
+    }
+  ], function(err) {
+    if (err) return next(err);
+    res.redirect('/forgot');
+  });
+});
+
+app.get('/reset/:token', function(req, res) {
+  user.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+    if(err){
+        console.log(err);
+    }else{
+    if (!user) {
+      req.flash('error', 'Password reset token is invalid or has expired.');
+      return res.redirect('/forgot');
+    }}
+    res.render('reset.ejs', {token: req.params.token, message:req.flash('error'), message1:req.flash('error1'), message2:req.flash('error2')});
+  });
+});
+
+app.post('/reset/:token', function(req, res) {
+  async.waterfall([
+    function(done) {
+      user.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+        if(err){
+            console.log(err);
+        }
+        if (!user) {
+          req.flash('error1', 'Password reset token is invalid or has expired.');
+          return res.redirect('back');
+        }
+        if(req.body.password === req.body.confirmpassword) {
+          user.setPassword(req.body.password, function(err) {
+              if(err){
+                  console.log(err);
+              }
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+
+            user.save(function(err) {
+                if(err){
+                    console.log(err);
+                }
+              req.logIn(user, function(err) {
+                if(err){
+                    console.log(err);
+                }
+                
+                    done(err, user);
+              });
+            });
+          })
+        } else {
+            req.flash("error2", "Passwords do not match.");
+            return res.redirect('back');
+        }
+      });
+    },
+    function(user, done) {
+      var smtpTransport = nodeMailer.createTransport({
+        service: 'Gmail', 
+        auth: {
+          user: 'librarymanagementsystem745@gmail.com',
+          pass: 'librarymanagementsystem'
+        }
+      });
+      var mailOptions = {
+        to: user.username,
+        from: 'librarymanagementsystem745@gmail.com',
+        subject: 'Your password has been changed',
+        text: 'Hello,\n\n' +
+          'This is a confirmation that the password for your account ' + user.username + ' has just been changed.\n'
+      };
+      smtpTransport.sendMail(mailOptions, function(err) {
+          if(err){
+              console.log(err);
+          }
+        req.flash('success', 'Success! Your password has been changed.');
+        done(err);
+      });
+    }
+  ], function(err) {
+      if(err){
+          console.log(err);
+      }
+    res.redirect('/homepage');
+  });
+});
 
 //-----------------------------------------------------
 app.listen(process.env.PORT, process.env.IP, function(){
