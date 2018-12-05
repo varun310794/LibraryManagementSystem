@@ -19,8 +19,17 @@
                 <div class="form-group">
                     <a class="btn btn-lg btn-primary btn-block" href="/employees">Our Employees</a>
                 </div>
-                
-        </div>
+                <div>
+                    <p>
+            	<form action="/books" method="GET" class="form-inline">
+            		<div class="form-group">
+            			<input type="text" name="search" placeholder="Campground search..." class="form-control">
+            			<input type="submit" value="Search" class="btn btn-default">
+            		</div>
+            	</form>
+            </p>
+                </div>
+               
     </div>
 </div>
 <% include partials/footer %>

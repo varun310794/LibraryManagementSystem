@@ -83,7 +83,7 @@ app.use(function(req, res, next){
 
 // homepage----------------------------------------
 
-app.get("/", function(req, res){
+app.get("/",isLoggedIn, function(req, res){
     res.render("login.ejs", {message:req.flash("err")});
 });
 
@@ -97,13 +97,30 @@ app.get("/books/new",isLoggedIn, function(req, res){
 });
 
 app.get("/books", isLoggedIn, function(req, res){
+     var noMatch = null;
+    if(req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        // Get all campgrounds from DB
+        book.find({$or: [{name: regex,}, {author: regex}]}, function(err, allbooks){
+           if(err){
+               console.log(err);
+           } else {
+              if(allbooks.length < 1) {
+                  noMatch = "Sorry! Looks like we do not have that book";
+              }
+              res.render("books.ejs",{allbooks:allbooks, noMatch: noMatch});
+           }
+        });
+    }else{
+        var noMatch = null
     book.find({}, function(err, allbooks){
         if(err){
             console.log(err);
         }else{
-            res.render("books.ejs",{allbooks:allbooks});
+            res.render("books.ejs",{allbooks:allbooks,noMatch: noMatch});
         }
     });
+}
 });
 
 app.post("/books",isLoggedIn, function(req, res){
@@ -119,6 +136,10 @@ app.post("/books",isLoggedIn, function(req, res){
         }
     });
 });
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
 
 app.delete("/:id",isLoggedIn, function(req, res){
    //res.send("hi");
