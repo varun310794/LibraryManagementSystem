@@ -27,6 +27,9 @@ var bookSchema=new mongoose.Schema({
     name:String,
     author:String,
     id:Number,
+    img:String,
+    type:String,
+    summary:String,
     customers:[
                 {
                     type: mongoose.Schema.Types.ObjectId,
