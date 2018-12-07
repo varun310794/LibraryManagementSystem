@@ -30,6 +30,7 @@ var bookSchema=new mongoose.Schema({
     img:String,
     type:String,
     summary:String,
+    published:Number,
     customers:[
                 {
                     type: mongoose.Schema.Types.ObjectId,
@@ -104,7 +105,7 @@ app.get("/books", isLoggedIn, function(req, res){
     if(req.query.search){
         const regex = new RegExp(escapeRegex(req.query.search), 'gi');
         // Get all campgrounds from DB
-        book.find({$or: [{name: regex,}, {author: regex}]}, function(err, allbooks){
+        book.find({$or: [{name: regex,}, {author: regex}, {type: regex}]}, function(err, allbooks){
            if(err){
                console.log(err);
            } else {
@@ -130,7 +131,11 @@ app.post("/books",isLoggedIn, function(req, res){
     var name=req.body.name;
     var author=req.body.author;
     var id=req.body.id;
-    var newBook={name:name, author: author, id: id};
+    var type=req.body.type;
+    var img=req.body.img;
+    var summary=req.body.summary;
+    var published=req.body.published;
+    var newBook={name:name, author: author, id: id, type:type, img:img, summary:summary};
     book.create(newBook,function(err, theBook){
         if(err){
             console.log(err);
@@ -143,6 +148,16 @@ app.post("/books",isLoggedIn, function(req, res){
 function escapeRegex(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
+
+app.get("/books/:id", function(req, res){
+    book.findById(req.params.id, function(err, foundbook){
+        if(err){
+            console.log(err);
+        }else{
+            res.render("showb.ejs", {foundbook:foundbook});
+        }
+    });
+});
 
 app.delete("/:id",isLoggedIn, function(req, res){
    //res.send("hi");
