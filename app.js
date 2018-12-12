@@ -218,7 +218,7 @@ app.get("/customers/:id",isLoggedIn, function(req, res){
         }
         else{
             
-            res.render("show.ejs", {fcustomer:fcustomer});
+            res.render("show.ejs", {fcustomer:fcustomer, error:req.flash("error"), message:req.flash("message")});
         }
     });    
 });
@@ -227,12 +227,20 @@ app.get("/customers/:id",isLoggedIn, function(req, res){
 
 //--------------------------------------------------------
 app.post("/customers/:id/checkout",isLoggedIn, function(req, res){
+    if(req.body.id===""){
+        req.flash("error", "Please enter a valid book id.");
+        res.redirect("/customers/" + req.params.id);
+    }else{
     customer.findById(req.params.id, function(err, foundcustomer){
         if(err){
             console.log(err);
         }else{
             var fid=req.body.id;
             book.findOne({id:fid}, function(err, foundbook){
+                if(!foundbook){
+                   req.flash("message", "Sorry!No corresponding book found on that ID.");
+                   res.redirect("/customers/" + req.params.id);    
+                }else{
                 if(err){
                     console.log(err);
                 }else{
@@ -240,16 +248,24 @@ app.post("/customers/:id/checkout",isLoggedIn, function(req, res){
                     foundcustomer.save(function(err, data){
                         if(err){
                             console.log(err);
+                        }
+                    foundbook.customers.push(foundcustomer);
+                    foundbook.save(function(err, data){
+                        if(err){
+                            console.log(err);
                         }else{
-                            res.redirect("/customers/" + req.params.id);  
+                            res.redirect("/customers/" + req.params.id);    
                         }
                     });
+                    });   
                 }
-            });
+            }});
             
         }
     });    
-});
+    }    
+    });
+
 
 //---------------------------------------------------------
  app.post("/customers/:cid/:bid/checkin",isLoggedIn, function(req, res){
