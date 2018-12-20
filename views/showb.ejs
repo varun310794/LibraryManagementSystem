@@ -29,4 +29,28 @@
                  
         </div>    
     </div>    
+     <div class="row">
+        <div class="col-lg-3">
+        </div>
+        
+        <div class="col-lg-3 thumbnail">
+            <%if(foundbook.cook.length===0){%>
+                <p>No copies available at Cook Library</p>
+            <%}else{%>
+               <h3><%=foundcook.location %></h3>
+               <h5>No of copies available: <b><%=foundcook.count  %></b></h5> 
+                <h5>Location: Shelf <%= foundcook.shelf %></h5> 
+            <%}%>
+        </div>
+    
+        <div class="col-lg-3 thumbnail">
+            <%if(foundbook.aspen.length===0){%>
+                <p>No copies available at Aspen Dr Library</p>
+            <%}else{%>
+               <h3><%=foundaspen.location %></h3>
+               <h5>No of copies available: <b><%=foundaspen.count  %></b></h5> 
+                <h5>Location: Shelf <%= foundaspen.shelf %></h5> 
+            <%}%>
+        </div>
+    
 <% include partials/footer %>    

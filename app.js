@@ -31,6 +31,18 @@ var bookSchema=new mongoose.Schema({
     type:String,
     summary:String,
     published:Number,
+    cook:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "cook"
+                }
+        ],
+    aspen:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "aspen"
+                }
+        ],    
     customers:[
                 {
                     type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +52,63 @@ var bookSchema=new mongoose.Schema({
 });
 
 var book=mongoose.model("book",bookSchema);
+
+//------------------------------------------------
+//Book Count Schema
+var inventorySchema=new mongoose.Schema({
+        books:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "book"
+                }
+              ],
+        cook:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "cook"
+                }
+              ],      
+        aspen:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "aspen"
+                }
+              ],
+});
+
+var inventory=mongoose.model("inventory", inventorySchema);
+//-------------------------------------------------
+//Cook library Schema
+var cookSchema=new mongoose.Schema({
+        books:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "book"
+                }
+              ],
+        id:Number,
+        count:Number,
+        location:String,
+        shelf:String
+});
+
+var cook=mongoose.model("cook", cookSchema);
+//-------------------------------------------------
+//Aspen Schema
+var aspenSchema=new mongoose.Schema({
+        books:[
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "book"
+                }
+              ],
+        id:Number,
+        count:Number,
+        location:String,
+        shelf:String
+});
+
+var aspen=mongoose.model("aspen", aspenSchema);
 
 //-------------------------------------------------
 
@@ -104,7 +173,7 @@ app.get("/books", isLoggedIn, function(req, res){
      var noMatch = null;
     if(req.query.search){
         const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-        // Get all campgrounds from DB
+        
         book.find({$or: [{name: regex,}, {author: regex}, {type: regex}]}, function(err, allbooks){
            if(err){
                console.log(err);
@@ -135,29 +204,199 @@ app.post("/books",isLoggedIn, function(req, res){
     var img=req.body.img;
     var summary=req.body.summary;
     var published=req.body.published;
-    var newBook={name:name, author: author, id: id, type:type, img:img, summary:summary};
-    book.create(newBook,function(err, theBook){
+    var count=req.body.count;
+    var location=req.body.locations;
+    var shelf=req.body.shelf;
+    var newBook={name:name, author: author, id: id, type:type, img:img, summary:summary, published:published};
+    var bookData={id:id, count:count, location:location, shelf:shelf};
+    book.findOne({name:req.body.name, author:req.body.author}, function(err, foundBook){
+        if(!foundBook){
+            console.log(err);
+                 book.create(newBook,function(err, theBook){
         if(err){
             console.log(err);
         }else{
-            res.redirect("/books");
+             if(req.body.locations==="Cook Library"){   
+               cook.create(bookData, function(err, bookData){
+                if(err){
+                    console.log(err);
+                }else{
+                    theBook.cook.push(bookData);
+                    theBook.save(function(err){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            bookData.books.push(theBook);
+                            bookData.save(function(err){
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    res.redirect("/books");
+                                }
+                            });
+                        }
+                    });
+                }
+            }); 
+            }else{
+                aspen.create(bookData, function(err, bookData){
+                if(err){
+                    console.log(err);
+                }else{
+                    theBook.aspen.push(bookData);
+                    theBook.save(function(err){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            bookData.books.push(theBook);
+                            bookData.save(function(err){
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    res.redirect("/books");
+                                }
+                            });
+                        }
+                    });
+                }
+            }); 
+            }
         }
     });
+            } else if(foundBook){
+                if(req.body.locations==="Cook Library"){
+                cook.findById(foundBook.cook[0], function(err, foundCook){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        
+                            if(foundBook.cook.length===0){
+                                 cook.create(bookData, function(err, bookData){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        foundBook.cook.push(bookData);
+                        foundBook.save(function(err){
+                            if(err){
+                                console.log(err);
+                            }else{
+                                bookData.books.push(foundBook);
+                                bookData.save(function(err){
+                                    if(err){
+                                        console.log(err);
+                                    }else{
+                                        res.redirect("/books");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }); 
+                            }else{
+                       var count=foundCook.count;
+                       var newCount=Number(count)+Number(req.body.count);
+                       cook.findByIdAndUpdate({_id:foundBook.cook[0]}, {$set:{count:newCount}}, function(err, foundCook){
+                           if(err){
+                               console.log(err);
+                           }else{
+                               foundCook.save(function(err){
+                                   if(err){
+                                       console.log(err);
+                                   }else{
+                                        res.redirect("/books");       
+                                   }
+                               });
+                                
+                           }
+                       });
+                   }
+                    }
+                });
+                   
+                }else{
+                   aspen.findById(foundBook.aspen[0], function(err, foundAspen){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        
+                            if(foundBook.aspen.length===0){
+                                 aspen.create(bookData, function(err, bookData){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        foundBook.aspen.push(bookData);
+                        foundBook.save(function(err){
+                            if(err){
+                                console.log(err);
+                            }else{
+                                bookData.books.push(foundBook);
+                                bookData.save(function(err){
+                                    if(err){
+                                        console.log(err);
+                                    }else{
+                                        res.redirect("/books");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }); 
+                            }else{
+                       var count=foundAspen.count;
+                       var newCount=Number(count)+Number(req.body.count);
+                       aspen.findByIdAndUpdate({_id:foundBook.aspen[0]}, {$set:{count:newCount}}, function(err, foundAspen){
+                           if(err){
+                               console.log(err);
+                           }else{
+                               foundAspen.save(function(err){
+                                   if(err){
+                                       console.log(err);
+                                   }else{
+                                        res.redirect("/books");       
+                                   }
+                               });
+                                
+                           }
+                       });
+                   }
+                    }
+                }); 
+                }
+                
+            }
+    });
+    
 });
 
 function escapeRegex(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-};
+}
 
 app.get("/books/:id", function(req, res){
     book.findById(req.params.id, function(err, foundbook){
         if(err){
             console.log(err);
         }else{
-            res.render("showb.ejs", {foundbook:foundbook});
+            cook.findById(foundbook.cook[0], function(err, foundcook){
+                if(err){
+                    console.log(err);
+                }else{
+                    aspen.findById(foundbook.aspen[0], function(err, foundaspen){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.render("showb.ejs", {foundbook:foundbook, foundcook:foundcook, foundaspen:foundaspen});                            
+                        }
+                    });
+                }
+            });
+                        
         }
     });
 });
+
+
+
 
 app.delete("/:id",isLoggedIn, function(req, res){
    //res.send("hi");
@@ -175,15 +414,34 @@ app.get("/customers/new",isLoggedIn, function(req, res){
     res.render("newcustomers.ejs");
 });
 
-app.get("/customers",isLoggedIn, function(req, res){
+app.get("/customers", isLoggedIn, function(req, res){
+     var noMatch = null;
+    if(req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        
+        customer.find({$or: [{name: regex,}]}, function(err, allcustomers){
+           if(err){
+               console.log(err);
+           } else {
+              if(allcustomers.length < 1) {
+                  noMatch = "Sorry! Looks like we do not have that customer in our system";
+              }
+              res.render("customers.ejs",{allcustomers:allcustomers, noMatch: noMatch});
+           }
+        });
+    }else{
+        var noMatch = null
     customer.find({}, function(err, allcustomers){
         if(err){
             console.log(err);
         }else{
-            res.render("customers.ejs",{allcustomers:allcustomers});
+            res.render("customers.ejs",{allcustomers:allcustomers,noMatch: noMatch});
         }
     });
+}
 });
+
+
 
 app.post("/customers",isLoggedIn, function(req, res){
     var name=req.body.name;
