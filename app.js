@@ -53,30 +53,7 @@ var bookSchema=new mongoose.Schema({
 
 var book=mongoose.model("book",bookSchema);
 
-//------------------------------------------------
-//Book Count Schema
-var inventorySchema=new mongoose.Schema({
-        books:[
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "book"
-                }
-              ],
-        cook:[
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "cook"
-                }
-              ],      
-        aspen:[
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "aspen"
-                }
-              ],
-});
 
-var inventory=mongoose.model("inventory", inventorySchema);
 //-------------------------------------------------
 //Cook library Schema
 var cookSchema=new mongoose.Schema({
@@ -476,7 +453,7 @@ app.get("/customers/:id",isLoggedIn, function(req, res){
         }
         else{
             
-            res.render("show.ejs", {fcustomer:fcustomer, error:req.flash("error"), message:req.flash("message")});
+            res.render("show.ejs", {fcustomer:fcustomer, error:req.flash("error"), message:req.flash("message"), errorr:req.flash("errorr")});
         }
     });    
 });
@@ -502,7 +479,21 @@ app.post("/customers/:id/checkout",isLoggedIn, function(req, res){
                 if(err){
                     console.log(err);
                 }else{
-                    foundcustomer.books.push(foundbook);
+                    
+                    if(req.body.locations==="Cook Library"){
+                        cook.findById(foundbook.cook[0], function(err, foundcook){
+                        if(!foundcook){
+                            console.log(err);
+                            req.flash("errorr", "Sorry! This book is not available.");
+                            res.redirect("/customers/" + req.params.id);
+                        }else{
+                            var count=Number(foundcook.count);
+                            var newCount=count-1;
+                            cook.findByIdAndUpdate({_id:foundbook.cook[0]}, {$set:{count:newCount}}, function(err, foundCook){
+                             if(err){
+                                console.log(err);
+                             }else{
+                                foundcustomer.books.push(foundbook);
                     foundcustomer.save(function(err, data){
                         if(err){
                             console.log(err);
@@ -512,10 +503,52 @@ app.post("/customers/:id/checkout",isLoggedIn, function(req, res){
                         if(err){
                             console.log(err);
                         }else{
-                            res.redirect("/customers/" + req.params.id);    
+                            res.redirect("/customers/" + req.params.id);
                         }
                     });
-                    });   
+                    }); 
+                                
+                        }
+                    });
+                        }
+                    });    
+                    }else{
+                        aspen.findById(foundbook.aspen[0], function(err, foundaspen){
+                        if(!foundaspen){
+                            console.log(err);
+                            req.flash("errorr", "Sorry! This book is not available.");
+                            res.redirect("/customers/" + req.params.id);
+                        }else{
+                            var count=Number(foundaspen.count);
+                            var newCount=count-1;
+                            aspen.findByIdAndUpdate({_id:foundbook.aspen[0]}, {$set:{count:newCount}}, function(err, foundaspen){
+                             if(err){
+                                console.log(err);
+                             }else{
+                                 foundcustomer.books.push(foundbook);
+                    foundcustomer.save(function(err, data){
+                        if(err){
+                            console.log(err);
+                        }
+                    foundbook.customers.push(foundcustomer);
+                    foundbook.save(function(err, data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                             res.redirect("/customers/" + req.params.id);
+                        }
+                    });
+                    });
+        
+                        }
+                    });
+                        }
+                    }); 
+                    }    
+                    
+                        
+                    
+                    
                 }
             }});
             
@@ -523,7 +556,6 @@ app.post("/customers/:id/checkout",isLoggedIn, function(req, res){
     });    
     }    
     });
-
 
 //---------------------------------------------------------
  app.post("/customers/:cid/:bid/checkin",isLoggedIn, function(req, res){
@@ -541,9 +573,15 @@ customer.findById(req.params.cid, function(err, foundcustomer){
                     foundcustomer.save(function(err, data){
                         if(err){
                             console.log(err);
-                        }else{
-                            res.redirect("/customers/" + req.params.cid);
                         }
+                        foundbook.customers.pull(foundcustomer);
+                        foundbook.save(function(err, data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            res.redirect("/customers/" + req.params.cid);    
+                        }
+                    });
                     });
                 }
             });

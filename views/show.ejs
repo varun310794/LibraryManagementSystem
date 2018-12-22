@@ -31,11 +31,17 @@
         <div style="width: 30%; margin: 25px auto;">
              <h5><%= error %></h5>
               <h5><%= message %></h5>
+              <h5><%= errorr %></h5>
             <form action="/customers/<%= fcustomer._id %>/checkout" method="Post">
                 <div class="form-group">
                     <input class="form-control" type="text" name="id" placeholder="Enter book id">
                 </div>
-                
+                <div>
+                    <select name="locations">
+                        <option>Cook Library</option>
+                        <option>Aspen Dr Library</option>
+                    </select>
+                </div>   </br> 
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Checkout</button>
                 </div>
